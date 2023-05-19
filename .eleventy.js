@@ -1,37 +1,22 @@
 const wikiTransforms = require('./utils/wikiTransforms.js');
 const inputDir = '../massive-wiki/';
+
 module.exports = function (eleventyConfig) {
 
     // set the default layout 
     eleventyConfig.addGlobalData("layout", "page.html");
     eleventyConfig.addGlobalData("permalink", "{{ page.filePathStem | underscore }}.html");
+    eleventyConfig.addGlobalData("title", "{{ page.filePathStem }}.html");
 
-    eleventyConfig.addFilter("underscore", (content) => content.replaceAll(' ', '_'));
+
+    // set URLS to be underscores instead of spaces and set readme to index.html
+    eleventyConfig.addFilter("underscore", (content) => {
+        if (content === '/README') return '/index'
+        return content.replaceAll(' ', '_')
+    });
 
     // wiki Links and images
     eleventyConfig.addTransform("wikiTransforms", wikiTransforms);
-
-    // const inspect = require("util").inspect;
-    // eleventyConfig.addFilter("debug", (content) => `<pre>${inspect(content)}</pre>`);
-
-    // //rewrite readme to index.html
-    // eleventyConfig.addTransform("readme2Index", async function (content) {
-    //     if (this.page.outputPath === 'output/README/index.html') {
-    //         this.page.outputPath = 'output/index.html';
-    //         this.page.fileSlug = '';
-    //         this.page.filePathStem = '/';
-    //         console.log(this.page);
-    //     }
-    //     return content; // no change done.
-    // });
-
-    // //rewrite readme to index.html
-    // eleventyConfig.addUrlTransform(({ url }) => {
-    //     if (url === "/README/") {
-    //         console.log(url);
-    //         return "/README2/";
-    //     }
-    // });
 
     // copy static files
     eleventyConfig.addPassthroughCopy({ "./static/": "/" });
@@ -39,21 +24,10 @@ module.exports = function (eleventyConfig) {
 
     //copy over all markdown files 
     eleventyConfig.addPassthroughCopy(inputDir + '**/*.md')//, {
-    //     expand: true, // expand symbolic links
-    //     filter: "!*", // copy all files
-    // }
-    //     // , {
-    //     //     filter: []//, '!**massivewikibuilder**']//, '!**/node_modules/**', '!**/output/**', '!**/static/**', '!**/obsidian/**', '!**/.obsidian/**', '!**/.massivewikibuilder/**', '!**/.massivewikibuilder11ty/**', '!**/.git/**', '!**/.gitignore/**', '!**/.gitattributes/**', '!**/.github/**', '!**/.github/w]
-    //     //     //filter: (a, b, c) => { console.log(a, b, c); return true; },
-    //     // }
-    // );
 
+    // TODO: doesn't seem to be working to ignore the .obsidion folder
     for (const ignore of [
-        '../.massivewikibuilder/**',
-        // '../.massivewikibuilder11ty/output/**',
-        // '../.massivewikibuilder11ty/README.md',
-        // '../.massivewikibuilder11ty/node_modules/**',
-        '../.obsidian/**',
+        '**/.obsidian/**',
     ]) {
         eleventyConfig.ignores.add(ignore);
         eleventyConfig.watchIgnores.add(ignore);
