@@ -1,6 +1,5 @@
 const wikiTransforms = require('./utils/wikiTransforms.js');
 const inputDir = '../massive-wiki/';
-//test deploy
 module.exports = function (eleventyConfig) {
 
     // Links and images
@@ -10,8 +9,8 @@ module.exports = function (eleventyConfig) {
     eleventyConfig.addPassthroughCopy({ "./static/": "/" });
 
 
-    // //copy over all markdown files 
-    // eleventyConfig.addPassthroughCopy('../**/*.md', {
+    //copy over all markdown files 
+    eleventyConfig.addPassthroughCopy(inputDir + '**/*.md')//, {
     //     expand: true, // expand symbolic links
     //     filter: "!*", // copy all files
     // }
