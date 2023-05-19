@@ -10,10 +10,10 @@ function wikiTransforms(content) {
     for (const match of matches) {
         if (match[1] === "!") {
             // Is an attachment / image
-            result = result.replace(match[0], `<img src="/${match[2]}" alt="${match[2]}" />`);
+            result = result.replace(match[0], `<img src="/${match[2].replaceAll(' ', '_')}" alt="${match[2]}" />`);
         } else {
             // Is a link
-            result = result.replace(match[0], `<a href="/${match[2]}">${match[2]}</a>`);
+            result = result.replace(match[0], `<a href="/${match[2].replaceAll(' ', '_')}">${match[2]}</a>`);
         }
     }
 

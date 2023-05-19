@@ -4,6 +4,9 @@ module.exports = function (eleventyConfig) {
 
     // set the default layout 
     eleventyConfig.addGlobalData("layout", "page.html");
+    eleventyConfig.addGlobalData("permalink", "{{ page.filePathStem | underscore }}.html");
+
+    eleventyConfig.addFilter("underscore", (content) => content.replaceAll(' ', '_'));
 
     // wiki Links and images
     eleventyConfig.addTransform("wikiTransforms", wikiTransforms);
