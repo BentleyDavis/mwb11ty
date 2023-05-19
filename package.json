@@ -4,8 +4,12 @@
     "@11ty/eleventy": "^2.0.1"
   },
   "scripts": {
+    "prebuild": "rimraf output",
+    "prestart": "rimraf output",
     "start": "eleventy --serve",
     "build": "eleventy"
   },
-  "dependencies": {}
+  "dependencies": {
+    "rimraf": "^5.0.1"
+  }
 }
