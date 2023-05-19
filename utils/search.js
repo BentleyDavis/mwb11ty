@@ -23,8 +23,6 @@ function generateSearchFunction(cacheId) {
             title: this.page.fileSlug,
         }));
 
-        console.log(this)
-
         first = false;
 
         return content;
