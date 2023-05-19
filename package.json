@@ -10,6 +10,7 @@
     "build": "eleventy"
   },
   "dependencies": {
+    "js-yaml": "^4.1.0",
     "lunr": "^2.3.9",
     "rimraf": "^5.0.1"
   }

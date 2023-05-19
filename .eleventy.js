@@ -25,6 +25,10 @@ module.exports = function (eleventyConfig) {
     // wiki Links and images
     eleventyConfig.addTransform("wikiTransforms", require('./utils/wikiTransforms.js'));
 
+    eleventyConfig.addDataExtension("yml, yaml", (contents, filePath) => {
+        return require("js-yaml").load(contents);
+    });
+
     // Add Search
     eleventyConfig.addTransform("search", search.generateSearchFunction(cacheId));
     eleventyConfig.on('eleventy.after', async ({ dir, results, runMode, outputMode }) => {
