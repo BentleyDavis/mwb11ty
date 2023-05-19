@@ -1,5 +1,10 @@
-const wikiTransforms = require('./utils/wikiTransforms.js');
 const inputDir = '../massive-wiki/';
+
+const search = require("./utils/search.js");
+const lunr = require("lunr");
+const cacheId = Date.now().valueOf();
+const searchIndexFileName = `./output/lunr-index-${cacheId}.js`;
+const pageIndexFileName = `./output/lunr-pages-${cacheId}.js`;
 
 module.exports = function (eleventyConfig) {
 
@@ -15,8 +20,38 @@ module.exports = function (eleventyConfig) {
         return content.replaceAll(' ', '_')
     });
 
+    eleventyConfig.addFilter("cacheId", () => cacheId.toString());
+
     // wiki Links and images
-    eleventyConfig.addTransform("wikiTransforms", wikiTransforms);
+    eleventyConfig.addTransform("wikiTransforms", require('./utils/wikiTransforms.js'));
+
+    // Add Search
+    eleventyConfig.addTransform("search", search.generateSearchFunction(cacheId));
+    eleventyConfig.on('eleventy.after', async ({ dir, results, runMode, outputMode }) => {
+        search.streamIndex.write("]");
+        search.streamIndex.end();
+        search.streamPages.write("]");
+        search.streamPages.end();
+
+        // // read in the search.json file and add it to luna
+        const fs = require('fs');
+        if (fs.existsSync(searchIndexFileName)) fs.unlinkSync(searchIndexFileName);
+        const json = fs.readFileSync('./search.json', 'utf8');
+        const pages = JSON.parse(json);
+        // //pages = require(`./search.json`);
+        var idx = lunr(function () {
+            this.ref('link')
+            this.field('title')
+            this.field('body')
+            for (const page of pages) {
+                this.add(page)
+            }
+        })
+        fs.writeFileSync(searchIndexFileName, 'lunr_index = ' + JSON.stringify(idx), 'utf8');
+        fs.renameSync(`./searchPages.json`, pageIndexFileName);
+        if (fs.existsSync("./search.json")) fs.unlinkSync("./search.json");
+
+    });
 
     // copy static files
     eleventyConfig.addPassthroughCopy({ "./static/": "/" });

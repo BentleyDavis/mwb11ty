@@ -10,6 +10,7 @@
     "build": "eleventy"
   },
   "dependencies": {
+    "lunr": "^2.3.9",
     "rimraf": "^5.0.1"
   }
 }
