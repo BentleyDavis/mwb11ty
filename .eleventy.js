@@ -52,8 +52,8 @@ module.exports = function (eleventyConfig) {
             }
         })
         fs.writeFileSync(searchIndexFileName, 'lunr_index = ' + JSON.stringify(idx), 'utf8');
-        fs.renameSync(`./searchPages.json`, pageIndexFileName);
-        if (fs.existsSync("./search.json")) fs.unlinkSync("./search.json");
+        if (fs.existsSync("./searchPages.json")) fs.renameSync(`./searchPages.json`, pageIndexFileName);
+        //if (fs.existsSync("./search.json")) fs.unlinkSync("./search.json");
 
     });
 
