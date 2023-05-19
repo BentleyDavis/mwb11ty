@@ -1,6 +1,6 @@
 const wikiTransforms = require('./utils/wikiTransforms.js');
 const inputDir = '../massive-wiki/';
-
+//test deploy
 module.exports = function (eleventyConfig) {
 
     // Links and images
