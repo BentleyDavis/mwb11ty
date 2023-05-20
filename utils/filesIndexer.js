@@ -8,7 +8,7 @@ async function filesIndexer(dir, fileIndex = {}) {
         if (!fileIndex[parsedName.name]) {
             fileIndex[parsedName.name] = [formattedFileData];
         } else {
-            fileIndex[parsedName.name] = push(formattedFileData)
+            fileIndex[parsedName.name].push(formattedFileData)
         }
     }
     return fileIndex;

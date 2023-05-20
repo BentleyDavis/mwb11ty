@@ -85,7 +85,7 @@ module.exports = function (eleventyConfig) {
     }
 
     return {
-        templateFormats: ['md', 'png'],
+        templateFormats: ['md', 'png', 'jpg', 'jpeg', 'gif', 'css', 'html', 'yml', 'yaml'],
         dir: {
             input: inputDir,
             output: 'output',
