@@ -1,10 +1,16 @@
 const inputDir = '../massive-wiki/';
+const outputDir = './output/';
+
+const { copyFile, mkdir } = require('fs').promises;
+const { join } = require('path');
+
 
 const search = require("./utils/search.js");
 const lunr = require("lunr");
 const filesIndexer = require("./utils/filesIndexer.js");
 const jsYaml = require("js-yaml");
 const wikiTransforms = require("./utils/wikiTransforms.js");
+const { log } = require('console');
 
 const cacheId = Date.now().valueOf();
 const searchIndexFileName = `./output/lunr-index-${cacheId}.js`;
@@ -16,7 +22,22 @@ module.exports = function (eleventyConfig) {
 
     eleventyConfig.on('eleventy.before', async ({ dir, runMode, outputMode }) => {
         filesindex = await filesIndexer(dir.input);
+
+        for (const fileDatas of Object.values(filesindex)) {
+            for (const fileData of fileDatas) {
+                console.log(fileData)
+                console.log(join(inputDir, fileData.path, fileData.nameData.base));
+                console.log(join(outputDir, fileData.path, fileData.nameData.base).replaceAll(' ', '_'));
+                await mkdir(join(outputDir, fileData.path).replaceAll(' ', '_'), { recursive: true },);
+                await copyFile(
+                    join(inputDir, fileData.path, fileData.nameData.base),
+                    join(outputDir, fileData.path, fileData.nameData.base).replaceAll(' ', '_')
+                )
+            }
+
+        }
     });
+
 
     // set the default layout 
     eleventyConfig.addGlobalData("layout", "page.html");
@@ -73,9 +94,6 @@ module.exports = function (eleventyConfig) {
     eleventyConfig.addPassthroughCopy({ "./static/": "/" });
 
 
-    //copy over all markdown files 
-    eleventyConfig.addPassthroughCopy(inputDir + '**/*.md')//, {
-
     // TODO: doesn't seem to be working to ignore the .obsidion folder
     for (const ignore of [
         '**/.obsidian/**',
@@ -85,7 +103,7 @@ module.exports = function (eleventyConfig) {
     }
 
     return {
-        templateFormats: ['md', 'png', 'jpg', 'jpeg', 'gif', 'css', 'html', 'yml', 'yaml'],
+        templateFormats: ['md'],
         dir: {
             input: inputDir,
             output: 'output',
