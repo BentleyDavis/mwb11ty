@@ -2,11 +2,21 @@ const inputDir = '../massive-wiki/';
 
 const search = require("./utils/search.js");
 const lunr = require("lunr");
+const filesIndexer = require("./utils/filesIndexer.js");
+const jsYaml = require("js-yaml");
+const wikiTransforms = require("./utils/wikiTransforms.js");
+
 const cacheId = Date.now().valueOf();
 const searchIndexFileName = `./output/lunr-index-${cacheId}.js`;
 const pageIndexFileName = `./output/lunr-pages-${cacheId}.js`;
 
 module.exports = function (eleventyConfig) {
+
+    let filesindex;
+
+    eleventyConfig.on('eleventy.before', async ({ dir, runMode, outputMode }) => {
+        filesindex = await filesIndexer(dir.input);
+    });
 
     // set the default layout 
     eleventyConfig.addGlobalData("layout", "page.html");
@@ -23,10 +33,12 @@ module.exports = function (eleventyConfig) {
     eleventyConfig.addFilter("cacheId", () => cacheId.toString());
 
     // wiki Links and images
-    eleventyConfig.addTransform("wikiTransforms", require('./utils/wikiTransforms.js'));
+    eleventyConfig.addTransform("wikiTransforms", (content) => {
+        return wikiTransforms(content, filesindex);
+    });
 
-    eleventyConfig.addDataExtension("yml, yaml", (contents, filePath) => {
-        return require("js-yaml").load(contents);
+    eleventyConfig.addDataExtension("yml, yaml", (content) => {
+        return jsYaml.load(content);
     });
 
     // Add Search
