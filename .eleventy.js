@@ -25,9 +25,6 @@ module.exports = function (eleventyConfig) {
 
         for (const fileDatas of Object.values(filesindex)) {
             for (const fileData of fileDatas) {
-                console.log(fileData)
-                console.log(join(inputDir, fileData.path, fileData.nameData.base));
-                console.log(join(outputDir, fileData.path, fileData.nameData.base).replaceAll(' ', '_'));
                 await mkdir(join(outputDir, fileData.path).replaceAll(' ', '_'), { recursive: true },);
                 await copyFile(
                     join(inputDir, fileData.path, fileData.nameData.base),

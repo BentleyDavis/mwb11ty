@@ -4,7 +4,7 @@ const { readdir } = require('fs').promises;
 async function filesIndexer(dir, fileIndex = {}) {
     for await (const f of getFiles(normalize(dir))) {
         const parsedName = parse(f.name)
-        const formattedFileData = { nameData: parsedName, path: f.path.slice(dir.length) }
+        const formattedFileData = { nameData: parsedName, path: f.path?.slice(dir.length) }
         if (!fileIndex[parsedName.name]) {
             fileIndex[parsedName.name] = [formattedFileData];
         } else {
