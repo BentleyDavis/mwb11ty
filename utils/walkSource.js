@@ -28,8 +28,10 @@ function walkSource(sourcePath, getFolder, notIgnored) {
     });
 }
 exports.walkSource = walkSource;
+//regex to match any numebr of dots at the start of a string
+const dotRegex = /^\.*/;
 function MatchIgnores(matchers) {
     const tempIgnoresTester = (0, anymatch_1.default)(matchers);
-    return (f) => !tempIgnoresTester(f.replace("..", ""));
+    return (f) => !tempIgnoresTester(f.replace(dotRegex, ""));
 }
 exports.MatchIgnores = MatchIgnores;

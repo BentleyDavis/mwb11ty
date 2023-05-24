@@ -10,10 +10,15 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const walkSource_1 = require("./walkSource");
-test('the data is peanut butter', () => __awaiter(void 0, void 0, void 0, function* () {
+test('two dots', () => __awaiter(void 0, void 0, void 0, function* () {
     const result = yield (0, walkSource_1.walkSource)("../massive-wiki/", mockGetFolder, notIgnored);
     expect(result.length).toBe(2);
     expect(result[0]).toBe("../massive-wiki/not_node/file1");
+}));
+test('one dot', () => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield (0, walkSource_1.walkSource)("./massive-wiki/", mockGetFolder, notIgnored);
+    expect(result.length).toBe(2);
+    expect(result[0]).toBe("./massive-wiki/not_node/file1");
 }));
 function mockGetFolder(folderPath) {
     return __awaiter(this, void 0, void 0, function* () {
@@ -32,6 +37,18 @@ const mockTree = {
     "../massive-wiki/not_node/": {
         childFolderPaths: [],
         filepaths: ["../massive-wiki/not_node/file1", "../massive-wiki/not_node/file2"]
+    },
+    "./massive-wiki/": {
+        childFolderPaths: ["./massive-wiki/node_modules/", "./massive-wiki/not_node/"],
+        filepaths: []
+    },
+    "./massive-wiki/node_modules/": {
+        childFolderPaths: [],
+        filepaths: ["./massive-wiki/node_modules/file1", "./massive-wiki/node_modules/file2"]
+    },
+    "./massive-wiki/not_node/": {
+        childFolderPaths: [],
+        filepaths: ["./massive-wiki/not_node/file1", "./massive-wiki/not_node/file2"]
     }
 };
 const ignores = [

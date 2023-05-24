@@ -9,23 +9,21 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const walkSource_1 = require("./utils/walkSource");
-const nodeGetFolder_1 = require("./utils/nodeGetFolder");
 const Eleventy = require("@11ty/eleventy");
 const inputDir = '../massive-wiki/';
 const outputDir = './output/';
 (function () {
     return __awaiter(this, void 0, void 0, function* () {
         console.log("Starting build...");
-        const ignores = [
-            "**/node_modules/**",
-            "**/.*/**",
-            "**/.*",
-        ];
-        const notIgnored = (0, walkSource_1.MatchIgnores)(ignores);
-        const sourceFiles = yield (0, walkSource_1.walkSource)(inputDir, nodeGetFolder_1.nodeGetFolder, notIgnored);
-        console.log("sourceFiles", sourceFiles);
-        // let elev = new Eleventy();
-        // await elev.write();
+        // const ignores: Matcher = [
+        //     "**/node_modules/**",
+        //     "**/.*/**",
+        //     "**/.*",
+        // ]
+        // const notIgnored: NotIgnored = MatchIgnores(ignores);
+        // const sourceFiles = await walkSource(inputDir, nodeGetFolder, notIgnored);
+        // console.log("sourceFiles", sourceFiles);
+        let eleventy = new Eleventy();
+        yield eleventy.write();
     });
 })();

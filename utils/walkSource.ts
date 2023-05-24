@@ -21,9 +21,12 @@ export type ResultsOfGetFolder = { childFolderPaths: string[], filepaths: string
 
 export type GetFolder = (folderPath: string) => Promise<ResultsOfGetFolder>
 
+//regex to match any numebr of dots at the start of a string
+const dotRegex = /^\.*/;
+
 export function MatchIgnores(matchers: Matcher) {
     const tempIgnoresTester: Tester = anymatch(matchers);
-    return (f: string) => !tempIgnoresTester(f.replace("..", ""))
+    return (f: string) => !tempIgnoresTester(f.replace(dotRegex, ""))
 }
 
 export type NotIgnored = (f: string) => boolean
