@@ -10,7 +10,6 @@ const lunr = require("lunr");
 const filesIndexer = require("./utils/filesIndexer.js");
 const jsYaml = require("js-yaml");
 const wikiTransforms = require("./utils/wikiTransforms.js");
-const { log } = require('console');
 
 const cacheId = Date.now().valueOf();
 const searchIndexFileName = `./output/lunr-index-${cacheId}.js`;
