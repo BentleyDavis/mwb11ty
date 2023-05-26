@@ -4,13 +4,16 @@
     "@11ty/eleventy": "^2.0.1",
     "@jest/globals": "^29.5.0",
     "@types/jest": "^29.5.1",
+    "@types/lunr": "^2.3.4",
+    "@types/path-browserify": "^1.0.0",
     "ts-jest": "^29.1.0"
   },
   "scripts": {
-    "prebuild": "rimraf output",
-    "prestart": "rimraf output",
-    "start": "tsc & eleventy --serve",
-    "build": "tsc & node build.js",
+    "prebuild": "rimraf input & rimraf output & tsc",
+    "prestart": "rimraf input & rimraf output & tsc",
+    "start": "eleventy --serve",
+    "build": "node eleventy",
+    "build2": "tsc & node build2.js",
     "test": "jest"
   },
   "dependencies": {
@@ -18,6 +21,7 @@
     "anymatch": "^3.1.3",
     "js-yaml": "^4.1.0",
     "lunr": "^2.3.9",
+    "path-browserify": "^1.0.1",
     "rimraf": "^5.0.1"
   }
 }

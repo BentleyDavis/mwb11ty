@@ -14,6 +14,8 @@
 
 ## dev Notes
 
+reading git data
+
 ```
 cd massive-wiki
 git log -1 --pretty="%cI\t%an\t%s" -- README.md
@@ -22,3 +24,28 @@ git log -1 --pretty="%cI\t%an\t%s" -- README.md
 ```
 
 maybe use (gt-js)[https://github.com/steveukx/git-js]
+
+## Next Use cases
+
+- As a wiki user I want to not see build files in the wiki (like all-pages.md) so that I can focus on the content
+- The JS build system wants to be able to add data to the .md files before 11ty takes over to be able to add backlinks and other data
+
+## flow
+
+read config file
+Data Gathering
+
+- list out all the source file paths in all the sources excluding ignored files and folders
+- calculate Source files destination path
+- Report destination conflicts (or last source wins)
+
+Move Source Files
+
+File Processing
+
+- Pull H1 for title
+- Determine official Wikilinks
+- Create Search Index
+
+- Copy files to destination (including any nexessary transforms like updating )
+- ...
