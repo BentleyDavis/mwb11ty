@@ -1,20 +1,27 @@
-import { MatchIgnores, walkSource } from "./utils/walkSource";
-import { nodeGetFolder } from "./utils/nodeGetFolder";
-import { nodeGetFile } from "./utils/nodeGetFile";
+// Types
 import { Source } from "./types/Source";
-import { log } from "console";
-import { parse as parsePath } from "path-browserify"
 import { FileData, LinkData } from "./types/FileData";
 import { Index } from "./types/Index";
-import { wikiLinks2HTML } from "./utils/wikiLinks2HTML";
-import { nodeSaveFile } from "./utils/nodeSaveFile";
-import { parse } from "path";
-import { nodeDelDir } from "./utils/nodeDelDir";
 
-// import { createSearchIndex } from "./utils/createSearchIndex";
+// Generic functions
+import { info, log } from "console";
+import { parse as parsePath } from "path-browserify"
+import { MatchIgnores, walkSource } from "./utils/walkSource";
+import { wikiLinks2HTML } from "./utils/wikiLinks2HTML";
+
+// infrastructure dependent functions
+import { nodeSaveFile } from "./utils/nodeSaveFile";
+import { nodeDelDir } from "./utils/nodeDelDir";
+import { nodeGetFolder } from "./utils/nodeGetFolder";
+import { nodeGetFile } from "./utils/nodeGetFile";
+
+// Node specific functions for things that have to be file based
+import { promises as fs, writeFile } from "fs";
+import { createSearchIndex } from "./utils/createSearchIndex";
 
 // const Eleventy = require("@11ty/eleventy");
 
+// Config
 const ignores = [
     "**/node_modules/**",
     "**/.*/**",
@@ -36,11 +43,20 @@ const sources: Source[] = [
     },
 ];
 
+const cacheId = Date.now().valueOf();
+const siteData: any = {
+    cacheId: cacheId,
+    destPath: './input/',
+}
+
+const searchIndexFileName = `${siteData.destPath}lunr-index-${cacheId}.js`;
+const searchPageIndexFileName = `${siteData.destPath}lunr-pages-${cacheId}.js`;
+
 (async function () {
 
-    log("Starting build...");
+    info("Starting build...");
 
-    log("listing source files...");
+    info("listing source files...");
 
     const files: FileData[] = [];
 
@@ -56,7 +72,7 @@ const sources: Source[] = [
         }
     }
 
-    log("Indexing...");
+    info("Indexing...");
 
     const fileNameIndex: Index<FileData[]> = files.reduce((index: Index<FileData[]>, item) => {
         const name = parsePath(item.sourcePath).name
@@ -82,12 +98,8 @@ const sources: Source[] = [
         if (file.url) file.url = file.url.replaceAll(' ', '_');
     }
 
-    //     log("Reading Source Files");
-
     // TODO: Doesn't take into account types of sources other than filesystem
     const getFile = nodeGetFile;
-    // add capture names to the below regex
-
 
     const markdownLinkRegex = /\[(?<label>[^\]]+)\]\((?<url>[^\)]+)\)/g;
     const htmlLinkRegex = /<a[^>]+href="(?<url>[^"]+)"[^>]*>(?<label>[^<]+)<\/a>/g;
@@ -137,9 +149,15 @@ const sources: Source[] = [
         }
     }
 
-    log("writing files ---");
+    info("creating search index...");
+    // TODO: change to read from source and uses file data for title and url etc...
+    const searchIndex = await createSearchIndex(
+        files.map(f => f.sourcePath).filter(f => f.endsWith('md')),
+        nodeGetFile);
 
-    log("clearing destination directories...")
+    info("writing files ---");
+
+    info("clearing destination directories...")
     const delDir = nodeDelDir;
 
     for (const source of sources) {
@@ -147,7 +165,7 @@ const sources: Source[] = [
     }
 
     const saveFile = nodeSaveFile;
-    log("Saving data files...");
+    info("Saving data files...");
 
     // save the fildata to JSON file in the destDir
     for (const file of files) {
@@ -160,18 +178,22 @@ const sources: Source[] = [
         }
     }
 
-
-
-
-    // NEXT STEPS
     // Output the orginal files to the 11ty input folder
+    // Just code in node directly as I don't see any other abstraction necessary for this part in the future. probably need to break this out to a different file
+    for (const file of files) {
+        await fs.mkdir(parsePath(file.destPath).dir, { recursive: true },);
+        await fs.copyFile(file.sourcePath, file.destPath);
+    }
 
+    info("Saving search files...");
+
+    // log("searchIndexFileName", searchIndexFileName);
+    // log("length", JSON.stringify(searchIndex).length);
+    await nodeSaveFile(JSON.stringify(searchIndex), searchIndexFileName);
+
+    // nodeSaveFile(searchPageIndexFileName, JSON.stringify(files));
 
     // ---------------------------------------------------------------------------------------------
-    // const searchIndex = await createSearchIndex(sourceFiles, nodeGetFile);
-
-    // console.log("searchIndex", searchIndex);
-
     // let eleventy = new Eleventy();
     // await eleventy.write();
 })();

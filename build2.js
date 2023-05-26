@@ -1,15 +1,20 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const walkSource_1 = require("./utils/walkSource");
-const nodeGetFolder_1 = require("./utils/nodeGetFolder");
-const nodeGetFile_1 = require("./utils/nodeGetFile");
+// Generic functions
 const console_1 = require("console");
 const path_browserify_1 = require("path-browserify");
+const walkSource_1 = require("./utils/walkSource");
 const wikiLinks2HTML_1 = require("./utils/wikiLinks2HTML");
+// infrastructure dependent functions
 const nodeSaveFile_1 = require("./utils/nodeSaveFile");
 const nodeDelDir_1 = require("./utils/nodeDelDir");
-// import { createSearchIndex } from "./utils/createSearchIndex";
+const nodeGetFolder_1 = require("./utils/nodeGetFolder");
+const nodeGetFile_1 = require("./utils/nodeGetFile");
+// Node specific functions for things that have to be file based
+const fs_1 = require("fs");
+const createSearchIndex_1 = require("./utils/createSearchIndex");
 // const Eleventy = require("@11ty/eleventy");
+// Config
 const ignores = [
     "**/node_modules/**",
     "**/.*/**",
@@ -29,9 +34,16 @@ const sources = [
         type: "fileSystem"
     },
 ];
+const cacheId = Date.now().valueOf();
+const siteData = {
+    cacheId: cacheId,
+    destPath: './input/',
+};
+const searchIndexFileName = `${siteData.destPath}lunr-index-${cacheId}.js`;
+const searchPageIndexFileName = `${siteData.destPath}lunr-pages-${cacheId}.js`;
 (async function () {
-    (0, console_1.log)("Starting build...");
-    (0, console_1.log)("listing source files...");
+    (0, console_1.info)("Starting build...");
+    (0, console_1.info)("listing source files...");
     const files = [];
     for (const [sourceIndex, source] of sources.entries()) {
         const { sourcePath, ignores, destPath } = source;
@@ -44,7 +56,7 @@ const sources = [
             });
         }
     }
-    (0, console_1.log)("Indexing...");
+    (0, console_1.info)("Indexing...");
     const fileNameIndex = files.reduce((index, item) => {
         const name = (0, path_browserify_1.parse)(item.sourcePath).name;
         if (index[name]) {
@@ -68,10 +80,8 @@ const sources = [
         if (file.url)
             file.url = file.url.replaceAll(' ', '_');
     }
-    //     log("Reading Source Files");
     // TODO: Doesn't take into account types of sources other than filesystem
     const getFile = nodeGetFile_1.nodeGetFile;
-    // add capture names to the below regex
     const markdownLinkRegex = /\[(?<label>[^\]]+)\]\((?<url>[^\)]+)\)/g;
     const htmlLinkRegex = /<a[^>]+href="(?<url>[^"]+)"[^>]*>(?<label>[^<]+)<\/a>/g;
     for (const file of files) {
@@ -114,14 +124,17 @@ const sources = [
                 file.links = links;
         }
     }
-    (0, console_1.log)("writing files ---");
-    (0, console_1.log)("clearing destination directories...");
+    (0, console_1.info)("creating search index...");
+    // TODO: change to read from source and uses file data for title and url etc...
+    const searchIndex = await (0, createSearchIndex_1.createSearchIndex)(files.map(f => f.sourcePath).filter(f => f.endsWith('md')), nodeGetFile_1.nodeGetFile);
+    (0, console_1.info)("writing files ---");
+    (0, console_1.info)("clearing destination directories...");
     const delDir = nodeDelDir_1.nodeDelDir;
     for (const source of sources) {
         await delDir(source.destPath);
     }
     const saveFile = nodeSaveFile_1.nodeSaveFile;
-    (0, console_1.log)("Saving data files...");
+    (0, console_1.info)("Saving data files...");
     // save the fildata to JSON file in the destDir
     for (const file of files) {
         const { name, ext, dir } = (0, path_browserify_1.parse)(file.destPath);
@@ -129,11 +142,18 @@ const sources = [
             saveFile(JSON.stringify(file, null, 2), dir + "/" + name + ".json");
         }
     }
-    // NEXT STEPS
     // Output the orginal files to the 11ty input folder
+    // Just code in node directly as I don't see any other abstraction necessary for this part in the future. probably need to break this out to a different file
+    for (const file of files) {
+        await fs_1.promises.mkdir((0, path_browserify_1.parse)(file.destPath).dir, { recursive: true });
+        await fs_1.promises.copyFile(file.sourcePath, file.destPath);
+    }
+    (0, console_1.info)("Saving search files...");
+    // log("searchIndexFileName", searchIndexFileName);
+    // log("length", JSON.stringify(searchIndex).length);
+    await (0, nodeSaveFile_1.nodeSaveFile)(JSON.stringify(searchIndex), searchIndexFileName);
+    // nodeSaveFile(searchPageIndexFileName, JSON.stringify(files));
     // ---------------------------------------------------------------------------------------------
-    // const searchIndex = await createSearchIndex(sourceFiles, nodeGetFile);
-    // console.log("searchIndex", searchIndex);
     // let eleventy = new Eleventy();
     // await eleventy.write();
 })();
