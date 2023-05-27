@@ -9,10 +9,8 @@
     "ts-jest": "^29.1.0"
   },
   "scripts": {
-    "prebuild": "rimraf input & rimraf output & tsc",
-    "prestart": "rimraf input & rimraf output & tsc",
-    "start": "tsc & node build.js & eleventy --serve",
-    "build": "tsc & node build.js & eleventy",
+    "start": "tsc && node build.js && eleventy --serve",
+    "build": "tsc && node build.js && eleventy",
     "test": "jest"
   },
   "dependencies": {
