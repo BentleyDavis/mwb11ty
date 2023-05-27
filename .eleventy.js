@@ -122,7 +122,6 @@ module.exports = function (eleventyConfig) {
     //     eleventyConfig.ignores.add(ignore);
     //     eleventyConfig.watchIgnores.add(ignore);
     // }
-    console.log('inputDir', inputDir);
     return {
         templateFormats: ['md'],
         dir: {

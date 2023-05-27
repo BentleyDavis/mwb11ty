@@ -11,10 +11,8 @@
   "scripts": {
     "prebuild": "rimraf input & rimraf output & tsc",
     "prestart": "rimraf input & rimraf output & tsc",
-    "start": "tsc & node build2.js & eleventy --serve",
-    "build": "tsc & node build2.js & eleventy",
-    "build2": "tsc & node build2.js",
-    "build3": "set DEBUG=Eleventy* & eleventy",
+    "start": "tsc & node build.js & eleventy --serve",
+    "build": "tsc & node build.js & eleventy",
     "test": "jest"
   },
   "dependencies": {
