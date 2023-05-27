@@ -1,15 +1,18 @@
 import lunr from 'lunr'
 import { GetFile } from '../types/GetFile'
+import { FileData } from '../types/FileData';
 
 
-export async function createSearchIndex(filePaths: string[], getFile: GetFile) {
+export async function createSearchIndex(files: FileData[], getFile: GetFile) {
     const documents: { link: string, body: string }[] = [];
 
-    for (const filePath of filePaths) {
-        documents.push({
-            link: filePath,
-            body: await getFile(filePath)
-        });
+    for (const file of files) {
+        if (file.url) {
+            documents.push({
+                link: file.url,
+                body: await getFile(file.sourcePath)
+            });
+        }
     }
 
     var idx = lunr(function () {

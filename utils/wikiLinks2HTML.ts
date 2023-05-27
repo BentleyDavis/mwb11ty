@@ -30,17 +30,16 @@ export function wikiLinks2HTML(content: string, filesIndex: Index<FileData[]>) {
 
             if (match[1] === "!") {
                 // Is an attachment / image
-                const ext = parsePath(foundFileData.sourcePath).ext;
-                stringout += `<img src="${url + ext}" alt="${labl}" />`;
+                stringout += `<img src="${url}" alt="${labl}" />`;
                 newLinks.push({
-                    url: url + ext,
+                    url: url,
                     label: labl,
                     original: match[0],
                     index: match.index
                 });
             } else {
                 // Is a link
-                stringout += `<a href="${url}">${labl}</a>`;
+                stringout += `<a href="${url.replace('.md', '').replace('.html', '')}">${labl}</a>`;
                 newLinks.push({
                     url: url,
                     label: labl,

@@ -5,13 +5,15 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.createSearchIndex = void 0;
 const lunr_1 = __importDefault(require("lunr"));
-async function createSearchIndex(filePaths, getFile) {
+async function createSearchIndex(files, getFile) {
     const documents = [];
-    for (const filePath of filePaths) {
-        documents.push({
-            link: filePath,
-            body: await getFile(filePath)
-        });
+    for (const file of files) {
+        if (file.url) {
+            documents.push({
+                link: file.url,
+                body: await getFile(file.sourcePath)
+            });
+        }
     }
     var idx = (0, lunr_1.default)(function () {
         this.ref('link');

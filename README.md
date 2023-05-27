@@ -14,6 +14,10 @@
 
 ## dev Notes
 
+current errors:
+
+- search - not working
+
 reading git data
 
 ```
