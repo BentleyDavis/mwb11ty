@@ -6,6 +6,7 @@ export interface FileData {
     url?: string;
     replacers?: { match: string, replace: string }[];
     links?: LinkData[];
+    backLinks?: LinkData[];
     cacheId?: string | number;
     title?: string;
 }

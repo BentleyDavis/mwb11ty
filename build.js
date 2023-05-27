@@ -13,6 +13,7 @@ const nodeGetFile_1 = require("./utils/nodeGetFile");
 // Node specific functions for things that have to be file based
 const fs_1 = require("fs");
 const createSearchIndex_1 = require("./utils/createSearchIndex");
+const createIndex_1 = require("./utils/createIndex");
 const Eleventy = require("@11ty/eleventy");
 // Config
 const ignores = [
@@ -59,16 +60,15 @@ const searchPageIndexFileName = `${siteData.tempPath}search-pages-${cacheId}.js`
         }
     }
     (0, console_1.info)("Indexing...");
-    const fileNameIndex = files.reduce((index, item) => {
-        const name = (0, path_browserify_1.parse)(item.sourcePath).name;
-        if (index[name]) {
-            (index[name]).push(item);
-        }
-        else {
-            index[name] = [item];
-        }
-        return index;
-    }, {});
+    // const fileNameIndex: Index<FileData[]> = files.reduce((index: Index<FileData[]>, item) => {
+    //     const name = parsePath(item.sourcePath).name
+    //     if (index[name]) {
+    //         (index[name]).push(item);
+    //     } else {
+    //         index[name] = [item];
+    //     }
+    //     return index;
+    // }, {});
     // Convert Destination paths to urls
     for (const file of files) {
         const { destPath, sourceId } = file;
@@ -91,10 +91,13 @@ const searchPageIndexFileName = `${siteData.tempPath}search-pages-${cacheId}.js`
             file.title = (0, path_browserify_1.parse)(file.sourcePath).name;
         }
     }
+    const fileNameIndex = (0, createIndex_1.createIndex)(files, (item) => (0, path_browserify_1.parse)(item.sourcePath).name);
+    const fileUrlIndex = (0, createIndex_1.createIndex)(files.filter(f => f.url), "url");
     // TODO: Doesn't take into account types of sources other than filesystem
     const getFile = nodeGetFile_1.nodeGetFile;
     const markdownLinkRegex = /\[(?<label>[^\]]+)\]\((?<url>[^\)]+)\)/g;
     const htmlLinkRegex = /<a[^>]+href="(?<url>[^"]+)"[^>]*>(?<label>[^<]+)<\/a>/g;
+    // Find links in files
     for (const file of files) {
         const { sourcePath } = file;
         const extension = (0, path_browserify_1.parse)(sourcePath).ext;
@@ -135,6 +138,28 @@ const searchPageIndexFileName = `${siteData.tempPath}search-pages-${cacheId}.js`
                 file.links = links;
         }
     }
+    // find backlinks
+    for (const file of files) {
+        const { links } = file;
+        if (links) {
+            for (const link of links) {
+                const { url } = link;
+                const linkedFiles = fileUrlIndex[url];
+                if (!linkedFiles)
+                    continue;
+                for (const linkedFile of linkedFiles) {
+                    linkedFile.backLinks ??= [];
+                    linkedFile.backLinks.push({
+                        url: file.url || "",
+                        label: file.title || file.url || "",
+                        original: link.original,
+                        index: link.index
+                    });
+                }
+            }
+        }
+    }
+    // Create the search index
     (0, console_1.info)("creating search index...");
     // TODO: change to read from source and uses file data for title and url etc...
     const searchIndex = await (0, createSearchIndex_1.createSearchIndex)(files.filter(f => f.sourcePath.endsWith('md')), nodeGetFile_1.nodeGetFile);
@@ -178,8 +203,6 @@ const searchPageIndexFileName = `${siteData.tempPath}search-pages-${cacheId}.js`
         await fs_1.promises.copyFile(file.sourcePath, file.destPath);
     }
     (0, console_1.info)("Saving search files...");
-    // log("searchIndexFileName", searchIndexFileName);
-    // log("length", JSON.stringify(searchIndex).length);
     await (0, nodeSaveFile_1.nodeSaveFile)("search_index=" + JSON.stringify(searchIndex), searchIndexFileName);
     await (0, nodeSaveFile_1.nodeSaveFile)("search_pages=" + JSON.stringify(files), searchPageIndexFileName);
     // nodeSaveFile(searchPageIndexFileName, JSON.stringify(files));

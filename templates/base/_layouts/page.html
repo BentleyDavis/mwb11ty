@@ -20,6 +20,18 @@
             {% include '_sidebar.html' %}
             <div class="content markdown-body">
                 {{ markdown_body }}
+
+                {% if backLinks %}
+                <h2>Links to this page from this site:</h2>
+                <ul>
+                    {% for link in backLinks %}
+                    <li>
+                        <a href="{{ link.url }}">{{ link.label }}</a>
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% endif %}
+
             </div>
         </div>
     </section>

@@ -4,7 +4,7 @@ import { parse as parsePath } from "path-browserify"
 
 const obsidianImageRegex = /(!?)\[\[([^\]]+)\]\]/g;
 
-export function wikiLinks2HTML(content: string, filesIndex: Index<FileData[]>) {
+export function wikiLinks2HTML(content: string, filesIndex: Index<FileData[] | undefined>) {
     const matches = content.matchAll(obsidianImageRegex);
     const replacers = [];
     const newLinks: LinkData[] = [];

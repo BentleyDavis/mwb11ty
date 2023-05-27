@@ -18,6 +18,7 @@ import { nodeGetFile } from "./utils/nodeGetFile";
 // Node specific functions for things that have to be file based
 import { promises as fs, writeFile } from "fs";
 import { createSearchIndex } from "./utils/createSearchIndex";
+import { createIndex } from "./utils/createIndex";
 
 const Eleventy = require("@11ty/eleventy");
 
@@ -77,15 +78,15 @@ const searchPageIndexFileName = `${siteData.tempPath}search-pages-${cacheId}.js`
 
     info("Indexing...");
 
-    const fileNameIndex: Index<FileData[]> = files.reduce((index: Index<FileData[]>, item) => {
-        const name = parsePath(item.sourcePath).name
-        if (index[name]) {
-            (index[name]).push(item);
-        } else {
-            index[name] = [item];
-        }
-        return index;
-    }, {});
+    // const fileNameIndex: Index<FileData[]> = files.reduce((index: Index<FileData[]>, item) => {
+    //     const name = parsePath(item.sourcePath).name
+    //     if (index[name]) {
+    //         (index[name]).push(item);
+    //     } else {
+    //         index[name] = [item];
+    //     }
+    //     return index;
+    // }, {});
 
     // Convert Destination paths to urls
     for (const file of files) {
@@ -111,12 +112,17 @@ const searchPageIndexFileName = `${siteData.tempPath}search-pages-${cacheId}.js`
         }
     }
 
+    const fileNameIndex = createIndex(files, (item) => parsePath(item.sourcePath).name);
+
+    const fileUrlIndex = createIndex(files.filter(f => f.url), "url");
+
     // TODO: Doesn't take into account types of sources other than filesystem
     const getFile = nodeGetFile;
 
     const markdownLinkRegex = /\[(?<label>[^\]]+)\]\((?<url>[^\)]+)\)/g;
     const htmlLinkRegex = /<a[^>]+href="(?<url>[^"]+)"[^>]*>(?<label>[^<]+)<\/a>/g;
 
+    // Find links in files
     for (const file of files) {
         const { sourcePath } = file;
         const extension = parsePath(sourcePath).ext;
@@ -161,6 +167,29 @@ const searchPageIndexFileName = `${siteData.tempPath}search-pages-${cacheId}.js`
 
         }
     }
+
+    // find backlinks
+    for (const file of files) {
+        const { links } = file;
+        if (links) {
+            for (const link of links) {
+                const { url } = link;
+                const linkedFiles = fileUrlIndex[url];
+                if (!linkedFiles) continue;
+                for (const linkedFile of linkedFiles) {
+                    linkedFile.backLinks ??= [];
+                    linkedFile.backLinks.push({
+                        url: file.url || "",
+                        label: file.title || file.url || "",
+                        original: link.original,
+                        index: link.index
+                    });
+                }
+            }
+        }
+    }
+
+    // Create the search index
 
     info("creating search index...");
     // TODO: change to read from source and uses file data for title and url etc...
@@ -226,8 +255,6 @@ const searchPageIndexFileName = `${siteData.tempPath}search-pages-${cacheId}.js`
 
     info("Saving search files...");
 
-    // log("searchIndexFileName", searchIndexFileName);
-    // log("length", JSON.stringify(searchIndex).length);
     await nodeSaveFile(
         "search_index=" + JSON.stringify(searchIndex),
         searchIndexFileName
