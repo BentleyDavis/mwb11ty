@@ -138,7 +138,8 @@ const searchPageIndexFileName = `${siteData.tempPath}search-pages-${cacheId}.js`
                 file.links = links;
         }
     }
-    // find backlinks
+    const linkIndex = {};
+    // find backlinks & make link index
     for (const file of files) {
         const { links } = file;
         if (links) {
@@ -205,6 +206,7 @@ const searchPageIndexFileName = `${siteData.tempPath}search-pages-${cacheId}.js`
     (0, console_1.info)("Saving search files...");
     await (0, nodeSaveFile_1.nodeSaveFile)("search_index=" + JSON.stringify(searchIndex), searchIndexFileName);
     await (0, nodeSaveFile_1.nodeSaveFile)("search_pages=" + JSON.stringify(files), searchPageIndexFileName);
+    await (0, nodeSaveFile_1.nodeSaveFile)(JSON.stringify(files), `${siteData.tempPath}files.json`);
     // nodeSaveFile(searchPageIndexFileName, JSON.stringify(files));
     // ---------------------------------------------------------------------------------------------
     // info("Running 11ty...");

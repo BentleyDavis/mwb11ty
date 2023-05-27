@@ -168,7 +168,9 @@ const searchPageIndexFileName = `${siteData.tempPath}search-pages-${cacheId}.js`
         }
     }
 
-    // find backlinks
+    const linkIndex: Index<LinkData> = {};
+
+    // find backlinks & make link index
     for (const file of files) {
         const { links } = file;
         if (links) {
@@ -263,6 +265,8 @@ const searchPageIndexFileName = `${siteData.tempPath}search-pages-${cacheId}.js`
         "search_pages=" + JSON.stringify(files),
         searchPageIndexFileName
     );
+
+    await nodeSaveFile(JSON.stringify(files), `${siteData.tempPath}files.json`);
 
     // nodeSaveFile(searchPageIndexFileName, JSON.stringify(files));
 
