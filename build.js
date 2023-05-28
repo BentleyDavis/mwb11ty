@@ -14,6 +14,7 @@ const nodeGetFile_1 = require("./utils/nodeGetFile");
 const fs_1 = require("fs");
 const createSearchIndex_1 = require("./utils/createSearchIndex");
 const createIndex_1 = require("./utils/createIndex");
+const gitGetFileMeta_1 = require("./utils/gitGetFileMeta");
 const Eleventy = require("@11ty/eleventy");
 // Config
 const ignores = [
@@ -95,6 +96,11 @@ const searchPageIndexFileName = `${siteData.tempPath}search-pages-${cacheId}.js`
     const fileUrlIndex = (0, createIndex_1.createIndex)(files.filter(f => f.url), "url");
     // TODO: Doesn't take into account types of sources other than filesystem
     const getFile = nodeGetFile_1.nodeGetFile;
+    // Get File Metadata - last modified date, last modified by, etc
+    for (const file of files) {
+        const source = sources[file.sourceId];
+        const fileMeta = await (0, gitGetFileMeta_1.gitGetFileMeta)(file.sourcePath.slice(source.sourcePath.length), file, source.sourcePath);
+    }
     const markdownLinkRegex = /\[(?<label>[^\]]+)\]\((?<url>[^\)]+)\)/g;
     const htmlLinkRegex = /<a[^>]+href="(?<url>[^"]+)"[^>]*>(?<label>[^<]+)<\/a>/g;
     // Find links in files

@@ -9,6 +9,9 @@ export interface FileData {
     backLinks?: LinkData[];
     cacheId?: string | number;
     title?: string;
+    lastUpdated?: string;
+    lastUpdatedBy?: string;
+    lastUpdatedNote?: string;
 }
 
 export interface LinkData {

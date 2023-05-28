@@ -1,9 +1,45 @@
 ---
 layout: page.html
 ---
+
+
+<link href='https://unpkg.com/gridjs/dist/theme/mermaid.min.css' rel='stylesheet'>
+<script src="https://cdn.jsdelivr.net/npm/gridjs/dist/gridjs.umd.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        new gridjs.Grid({
+            from: document.getElementById('sourceTable'),
+            sort: true,
+            fixedHeader: true,
+            search: true,
+            autoWidth: true,
+        }).render(document.getElementById('destinationWrapper'));
+    });
+</script>
+
 {{ content }}
-<ul>
-    {%- for item in collections.all -%}
-    <li><a href="{{ item.url }}">{{item.data.title}}</a></li>
-    {%- endfor -%}
-</ul>
+<div id='destinationWrapper'></div>
+
+<table id='sourceTable'>
+
+    <thead>
+        <tr>
+            <th>Page</th>
+            <th>Change</th>
+            <th>by</th>
+            <th>Date</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        {% assign sorted = collections.all | sort_natural: "data.title" %}
+        {%- for item in sorted -%}
+        <tr>
+            <td><a href="{{ item.url }}">{{item.data.title}}</a></td>
+            <td>{{item.data.lastUpdatedNote}}</td>
+            <td>{{item.data.lastUpdatedBy}}</td>
+            <td>{{item.data.lastUpdated}}</td>
+        </tr>
+        {%- endfor -%}
+    </tbody>
+</table>

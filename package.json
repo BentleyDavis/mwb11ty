@@ -9,8 +9,11 @@
     "ts-jest": "^29.1.0"
   },
   "scripts": {
+    "prebuild": "rimraf input & rimraf output",
+    "prestart": "rimraf input & rimraf output",
     "start": "tsc && node build.js && eleventy --serve",
     "build": "tsc && node build.js && eleventy",
+    "play": "tsc && node play.js",
     "test": "jest"
   },
   "dependencies": {
@@ -19,6 +22,7 @@
     "js-yaml": "^4.1.0",
     "lunr": "^2.3.9",
     "path-browserify": "^1.0.1",
-    "rimraf": "^5.0.1"
+    "rimraf": "^5.0.1",
+    "simple-git": "^3.19.0"
   }
 }

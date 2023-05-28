@@ -19,6 +19,7 @@ import { nodeGetFile } from "./utils/nodeGetFile";
 import { promises as fs, writeFile } from "fs";
 import { createSearchIndex } from "./utils/createSearchIndex";
 import { createIndex } from "./utils/createIndex";
+import { gitGetFileMeta } from "./utils/gitGetFileMeta";
 
 const Eleventy = require("@11ty/eleventy");
 
@@ -118,6 +119,15 @@ const searchPageIndexFileName = `${siteData.tempPath}search-pages-${cacheId}.js`
 
     // TODO: Doesn't take into account types of sources other than filesystem
     const getFile = nodeGetFile;
+
+    // Get File Metadata - last modified date, last modified by, etc
+    for (const file of files) {
+        const source = sources[file.sourceId];
+        const fileMeta = await gitGetFileMeta(
+            file.sourcePath.slice(source.sourcePath.length),
+            file,
+            source.sourcePath);
+    }
 
     const markdownLinkRegex = /\[(?<label>[^\]]+)\]\((?<url>[^\)]+)\)/g;
     const htmlLinkRegex = /<a[^>]+href="(?<url>[^"]+)"[^>]*>(?<label>[^<]+)<\/a>/g;

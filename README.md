@@ -14,25 +14,13 @@
 
 ## dev Notes
 
-current errors:
+### Known Issues
 
-- search - not working
-
-reading git data
-
-```
-cd massive-wiki
-git log -1 --pretty="%cI\t%an\t%s" -- README.md
-
-2023-05-19T00:57:10-05:00\tBentley Davis\tadd all-pages
-```
-
-maybe use (gt-js)[https://github.com/steveukx/git-js]
+- Git it not reading from the right source repo!!!
 
 ## Next Use cases
 
-- As a wiki user I want to not see build files in the wiki (like all-pages.md) so that I can focus on the content
-- The JS build system wants to be able to add data to the .md files before 11ty takes over to be able to add backlinks and other data
+- See file (git) history on the website
 
 ## flow
 
