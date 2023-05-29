@@ -12,15 +12,9 @@
 - (Eleventy documentation)[https://www.11ty.dev/docs/]
 - (regex 101 - to help with writing regex)[https://regex101.com/]
 
-## dev Notes
+## dev Notes / Tasks
 
-### Known Issues
-
-- Git it not reading from the right source repo!!!
-
-## Next Use cases
-
-- See file (git) history on the website
+-
 
 ## flow
 
